@@ -1,0 +1,7 @@
+ <select name="Country" value={formData.Country} onChange={handleChange} required>
+                <option value="">Select Country</option>
+                {Object.keys(countryStateData).map((country) => (
+                    <option key={country} value={country}>{country}</option>
+                ))}
+            </select>
+            {errors.Country && <div style={{ color: 'red' }}>{errors.Country}</div>}
