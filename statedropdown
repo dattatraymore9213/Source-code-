@@ -1,0 +1,6 @@
+<option value="">Select State</option>
+                {states.map((state) => (
+                    <option key={state} value={state}>{state}</option>
+                ))}
+            </select>
+            {errors.State && <div style={{ color: 'red' }}>{errors.State}</div>}
