@@ -1,0 +1,38 @@
+import React, { useState } from 'react';
+import { Form, Button } from 'react-bootstrap';
+
+const UpdateParentInfo = ({ parentData, onUpdate }) => {
+    const [formData, setFormData] = useState({ ...parentData });
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prevState => ({
+            ...prevState,
+            [name]: value
+        }));
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        onUpdate(formData);
+    };
+
+    return (
+        <Form onSubmit={handleSubmit}>
+            <Form.Group controlId="formParentName">
+                <Form.Label>Parent Name</Form.Label>
+                <Form.Control
+                    type="text"
+                    name="ParentName"
+                    value={formData.ParentName}
+                    onChange={handleChange}
+                    required
+                />
+            </Form.Group>
+            {/* Add other form fields similarly */}
+            <Button variant="primary" type="submit">Update</Button>
+        </Form>
+    );
+};
+
+export default UpdateParentInfo;
