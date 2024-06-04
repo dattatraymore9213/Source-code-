@@ -1,0 +1,87 @@
+import React, { useState, useEffect } from 'react';
+import { Container, Row, Col, Button, Modal } from 'react-bootstrap';
+import axios from 'axios';
+import ParentInfo from './ParentInfo';
+import UpdateParentInfo from './UpdateParentInfo';
+import ViewCirculars from './ViewCirculars';
+
+const ParentDashboard = () => {
+    const [parentData, setParentData] = useState(null);
+    const [showUpdateModal, setShowUpdateModal] = useState(false);
+    const [circulars, setCirculars] = useState([]);
+
+    useEffect(() => {
+        // Fetch parent and circulars data
+        const fetchParentData = async () => {
+            try {
+                const response = await axios.get('https://localhost:7183/api/Parents/your-endpoint');
+                setParentData(response.data);
+            } catch (error) {
+                console.error('Error fetching parent data:', error);
+            }
+        };
+
+        const fetchCirculars = async () => {
+            try {
+                const response = await axios.get('https://localhost:7183/api/Circulars/your-endpoint');
+                setCirculars(response.data);
+            } catch (error) {
+                console.error('Error fetching circulars:', error);
+            }
+        };
+
+        fetchParentData();
+        fetchCirculars();
+    }, []);
+
+    const handleUpdateModal = () => setShowUpdateModal(!showUpdateModal);
+
+    const handleUpdateParentInfo = async (updatedData) => {
+        try {
+            await axios.put('https://localhost:7183/api/Parents/your-endpoint', updatedData);
+            setParentData(updatedData);
+            setShowUpdateModal(false);
+        } catch (error) {
+            console.error('Error updating parent data:', error);
+        }
+    };
+
+    return (
+        <Container>
+            <Row>
+                <Col>
+                    <h2>Parent Dashboard</h2>
+                </Col>
+            </Row>
+            <Row>
+                <Col>
+                    {parentData && <ParentInfo parentData={parentData} />}
+                    <Button variant="primary" onClick={handleUpdateModal}>
+                        Update Information
+                    </Button>
+                </Col>
+            </Row>
+            <Row>
+                <Col>
+                    <ViewCirculars circulars={circulars} />
+                </Col>
+            </Row>
+
+            <Modal show={showUpdateModal} onHide={handleUpdateModal}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Update Parent Information</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {parentData && (
+                        <UpdateParentInfo
+                            parentData={parentData}
+                            onUpdate={handleUpdateParentInfo}
+                        />
+                    )}
+                </Modal.Body>
+            </Modal>
+        </Container>
+    );
+};
+
+export default ParentDashboard;
