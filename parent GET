@@ -1,0 +1,107 @@
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+import axios from 'axios';
+import { Container, Button, Form, Alert } from 'react-bootstrap';
+
+const ParentDashboard = () => {
+    const location = useLocation();
+    const { registrationId } = location.state;
+    const [parentData, setParentData] = useState(null);
+    const [formData, setFormData] = useState({});
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
+
+    useEffect(() => {
+        const fetchParentData = async () => {
+            try {
+                const response = await axios.get(`https://localhost:7183/api/Parents/${registrationId}`);
+                if (response.data.success) {
+                    setParentData(response.data.parent);
+                    setFormData(response.data.parent);
+                } else {
+                    setError('Parent data not found');
+                }
+            } catch (error) {
+                setError('Failed to fetch parent data');
+            }
+        };
+
+        fetchParentData();
+    }, [registrationId]);
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prevState => ({
+            ...prevState,
+            [name]: value
+        }));
+    };
+
+    const handleUpdate = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await axios.put(`https://localhost:7183/api/Parents/${registrationId}`, formData);
+            if (response.data.success) {
+                setSuccess('Update successful');
+            } else {
+                setError('Update failed');
+            }
+        } catch (error) {
+            setError('Failed to update parent data');
+        }
+    };
+
+    if (error) {
+        return <Alert variant="danger">{error}</Alert>;
+    }
+
+    if (!parentData) {
+        return <div>Loading...</div>;
+    }
+
+    return (
+        <Container>
+            <h2>Parent Dashboard</h2>
+            <Form onSubmit={handleUpdate}>
+                <Form.Group controlId="formParentName">
+                    <Form.Label>Parent Name</Form.Label>
+                    <Form.Control 
+                        type="text" 
+                        name="ParentName" 
+                        value={formData.ParentName} 
+                        onChange={handleChange} 
+                        placeholder="Parent Name" 
+                        required 
+                    />
+                </Form.Group>
+                <Form.Group controlId="formStudentName">
+                    <Form.Label>Student Name</Form.Label>
+                    <Form.Control 
+                        type="text" 
+                        name="StudentName" 
+                        value={formData.StudentName} 
+                        onChange={handleChange} 
+                        placeholder="Student Name" 
+                        required 
+                    />
+                </Form.Group>
+                <Form.Group controlId="formStudentRegisterNumber">
+                    <Form.Label>Student Register Number</Form.Label>
+                    <Form.Control 
+                        type="text" 
+                        name="StudentRegisterNumber" 
+                        value={formData.StudentRegisterNumber} 
+                        onChange={handleChange} 
+                        placeholder="Student Register Number" 
+                        required 
+                    />
+                </Form.Group>
+                {/* Add more fields as necessary */}
+                <Button variant="primary" type="submit">Update</Button>
+            </Form>
+            {success && <Alert variant="success" className="mt-3">{success}</Alert>}
+        </Container>
+    );
+};
+
+export default ParentDashboard;
